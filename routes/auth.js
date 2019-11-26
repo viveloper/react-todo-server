@@ -83,15 +83,13 @@ router.post('/signin', (req, res, next) => {
           },
           (err, token) => {
             if (!err) {            
-              res.status(200).json({
-                success: true,
+              res.status(200).json({                
                 message: 'signin success.',                
                 token
               });
             }
             else {
-              res.status(500).json({
-                success: false,
+              res.status(500).json({                
                 message: 'token creation failure.'
               });
             }
@@ -99,18 +97,14 @@ router.post('/signin', (req, res, next) => {
         )
       }   
       else{
-        res.status(401).json({
-          success: false,
+        res.status(401).json({          
           message: 'email or password is wrong.'
         });
       }   
     }
     catch (error) {
       console.error(error);
-      res.status(500).json({
-        success: false,
-        message: 'failed to signin.'
-      });
+      res.status(500).json(error);
     }
   })();
 });

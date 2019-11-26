@@ -6,10 +6,15 @@ var Todo = require('../../models/todo.model');
 // GET Todo List by author
 router.get('/', async (req, res, next) => {
   const author = req.query.author ? req.query.author : req.user.username;
-  const todoList = await Todo.find({
-    author: author
-  });
-  res.json(todoList);
+  try {
+    const todoList = await Todo.find({
+      author: author
+    });
+    res.json(todoList);
+  }
+  catch (error) {
+    res.status(500).json(error);
+  }
 });
 
 // GET All Todo List
@@ -17,20 +22,25 @@ router.get('/all', (req, res, next) => {
   // GET All Todo
   Todo.find()
     .then(todoList => res.json(todoList))
-    .catch(err => res.status(400).json('Error: ' + err));
+    .catch(error => res.status(500).json(error));
 });
 
 // GET Todo by id
 router.get('/:id', async (req, res, next) => {
-  const todo = await Todo.findById(req.params.id);
-  res.json(todo);
+  try {
+    const todo = await Todo.findById(req.params.id);
+    res.json(todo);
+  }
+  catch (error) {
+    res.status(500).json(error);
+  }
 });
 
 // CREATE Todo
 router.post('/', async (req, res) => {
   const title = req.body.title;
   const author = req.body.author ? req.body.author : req.user.username;
-  const completed = req.body.completed;
+  const completed = req.body.completed ? req.body.completed : false;
 
   const todo = new Todo({
     title,
@@ -40,18 +50,10 @@ router.post('/', async (req, res) => {
 
   try {
     const savedTodo = await todo.save();
-    res.status(201).json({
-      success: true,
-      message: 'Todo added.',
-      todo: savedTodo
-    });
+    res.status(201).json(savedTodo);
   }
   catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to add todo.'
-    });
+    res.status(500).json(error);
   }
 });
 
@@ -63,11 +65,7 @@ router.delete('/:id', (req, res) => {
       message: 'Todo deleted.'
     }))
     .catch(error => {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to delete todo.'
-      })
+      res.status(500).json(error);
     });
 });
 
@@ -80,17 +78,10 @@ router.put('/:id', async (req, res) => {
     todo.completed = req.body.completed;
 
     const updatedTodo = await todo.save();
-    res.json({
-      success: true,
-      message: 'Todo updated.'
-    });
+    res.json(updatedTodo);
   }
   catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update todo.'
-    });
+    res.status(500).json(error);
   }
 });
 
